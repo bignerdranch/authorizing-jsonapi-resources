@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require_relative '../config/environment'
+
+if Rails.env != "development"
+  puts "Rails environment is #{Rails.env}; not gonna truncate THAT!"
+  exit false
+end
+
+User.destroy_all
+
+u1 = User.create(username: "josh", email: "josh@example.com")
+u2 = User.create(username: "actionplayer", email: "actionplayer@example.com")
+u3 = User.create(username: "sportplayer", email: "sportplayer@example.com")
