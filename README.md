@@ -1,24 +1,27 @@
-# README
+# Authorizing JSONAPI::Resources
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A tutorial for applying authorization rules with JSONAPI::Resources.
 
-Things you may want to cover:
+It can be accessed directly via a web service client like `curl` or Postman, or via the [Authorizing JSONAPI::Resources Client][client] Ember app.
 
-* Ruby version
+## Requirements
 
-* System dependencies
+* Ruby 2.2.2 or newer
+* Postgres 8.4 or newer
 
-* Configuration
+## Installation
 
-* Database creation
+```
+bundle install
+bin/rails db:setup
+bin/sample-data
+bin/rails serve
+```
 
-* Database initialization
+Check `bin/sample-data` for test user accounts.
 
-* How to run the test suite
+## License
 
-* Services (job queues, cache servers, search engines, etc.)
+MIT
 
-* Deployment instructions
-
-* ...
+[client]: https://github.com/bignerdranch/authorizing-jsonapi-resources-client
