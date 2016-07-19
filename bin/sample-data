@@ -6,8 +6,21 @@ if Rails.env != "development"
   exit false
 end
 
+VideoGame.destroy_all
 User.destroy_all
 
 u1 = User.create(username: "josh", email: "josh@example.com")
 u2 = User.create(username: "actionplayer", email: "actionplayer@example.com")
 u3 = User.create(username: "sportplayer", email: "sportplayer@example.com")
+
+u1.video_games.create(title: "Ultimate Wizard")
+u1.video_games.create(title: "Airship Pilot")
+u1.video_games.create(title: "Thy Dungeonman")
+
+u2.video_games.create(title: "Tomb Explorer")
+u2.video_games.create(title: "Hiding Behind Cover")
+u2.video_games.create(title: "Gotta Go Fast")
+
+u3.video_games.create(title: "Football Game 2015")
+u3.video_games.create(title: "Football Game 2016")
+u3.video_games.create(title: "Football Game 2017")
