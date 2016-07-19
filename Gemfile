@@ -9,6 +9,7 @@ gem 'jsonapi-resources', '0.7.1.beta2'
 gem 'rack-cors'
 gem 'bcrypt', '~> 3.1.7'
 gem 'doorkeeper'
+gem 'pundit'
 
 group :development, :test do
   gem 'pry'

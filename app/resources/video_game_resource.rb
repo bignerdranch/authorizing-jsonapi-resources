@@ -15,6 +15,6 @@ class VideoGameResource < ApplicationResource
 
   def self.records(options = {})
     user = current_user(options)
-    VideoGame.for_user_and_followed(user)
+    Pundit.policy_scope!(user, VideoGame)
   end
 end
