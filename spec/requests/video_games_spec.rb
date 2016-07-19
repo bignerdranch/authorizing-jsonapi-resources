@@ -3,7 +3,11 @@ require "rails_helper"
 RSpec.describe "/video-games" do
 
   let(:me) { FactoryGirl.create(:user, password: "password") }
-  let!(:games) { FactoryGirl.create_list(:video_game, 3, user: me) }
+  let(:someone_else) { FactoryGirl.create(:user) }
+
+  let(:my_games) { FactoryGirl.create_list(:video_game, 3, user: me) }
+  let(:someone_elses_games) { FactoryGirl.create_list(:video_game, 3, user: someone_else) }
+  let!(:all_games) { my_games + someone_elses_games }
 
   let(:response_json) { JSON.parse(response.body) }
   let(:response_games) { response_json["data"] }
@@ -26,21 +30,22 @@ RSpec.describe "/video-games" do
     context "authenticated" do
       include_context "with an access token"
 
-      it "returns all video games" do
+      it "returns all of the user's video games" do
         get "/video-games", headers: get_headers
 
         expect(response.status).to eq(200)
         expect(response_games).to_not be_nil
-        expect(response_games.count).to eq(games.count)
+        expect(response_games.count).to eq(my_games.count)
 
         response_titles = response_games.map{|n| n["attributes"]["title"]}
-        expect(response_titles).to match_array(games.map(&:title))
+        expect(response_titles).to match_array(my_games.map(&:title))
       end
     end
   end
 
   describe "GET #show" do
-    let(:game) { games[0] }
+    let(:game) { my_games[0] }
+
     context "not authenticated" do
       it "returns an unauthorized status" do
         get "/video-games/#{game.id}", headers: get_headers
@@ -48,7 +53,7 @@ RSpec.describe "/video-games" do
       end
     end
 
-    context "authenticated" do
+    context "my game" do
       include_context "with an access token"
 
       let(:response_game) { response_json["data"] }
@@ -59,6 +64,16 @@ RSpec.describe "/video-games" do
         expect(response_game).to_not be_nil
         expect(response_game["id"]).to eql(game.id.to_s)
         expect(response_game["attributes"]["title"]).to eq(game.title)
+      end
+    end
+
+    context "someone else's game" do
+      include_context "with an access token"
+
+      let(:game) { someone_elses_games[0] }
+      it "returns a not-found status" do
+        get "/video-games/#{game.id}", headers: get_headers
+        expect(response.status).to eq(404)
       end
     end
   end
@@ -104,7 +119,7 @@ RSpec.describe "/video-games" do
   end
 
   describe "PATCH #update" do
-    let(:game) { games[0] }
+    let(:game) { my_games[0] }
     let(:params) { JSON.dump({
       "data": {
         "type": "video-games",
@@ -122,7 +137,7 @@ RSpec.describe "/video-games" do
       end
     end
 
-    context "authenticated" do
+    context "my game" do
       include_context "with an access token"
 
       let(:response_game) { response_json["data"] }
@@ -134,10 +149,21 @@ RSpec.describe "/video-games" do
         expect(game.reload.title).to eq("Updated Game")
       end
     end
+
+    context "someone else's game" do
+      include_context "with an access token"
+
+      let(:game) { someone_elses_games[0] }
+      it "returns a not-found status" do
+        patch "/video-games/#{game.id}", params: params, headers: headers
+        expect(response.status).to eq(404)
+      end
+    end
   end
 
   describe "DELETE #destroy" do
-    let(:game) { games[0] }
+    let(:game) { my_games[0] }
+
     context "not authenticated" do
       it "returns an unauthorized status" do
         delete "/video-games/#{game.id}", headers: headers
@@ -145,7 +171,7 @@ RSpec.describe "/video-games" do
       end
     end
 
-    context "authenticated" do
+    context "my game" do
       include_context "with an access token"
 
       it "deletes the game" do
@@ -156,6 +182,16 @@ RSpec.describe "/video-games" do
         expect(response.status).to eq(204)
 
         expect{game.reload}.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "someone else's game" do
+      include_context "with an access token"
+
+      let(:game) { someone_elses_games[0] }
+      it "returns a not-found status" do
+        delete "/video-games/#{game.id}", headers: headers
+        expect(response.status).to eq(404)
       end
     end
   end
