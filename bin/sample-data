@@ -8,6 +8,7 @@ end
 
 VideoGame.destroy_all
 Follow.destroy_all
+Doorkeeper::AccessToken.destroy_all
 User.destroy_all
 
 u1 = User.create(username: "josh", email: "josh@example.com", password: "password")
