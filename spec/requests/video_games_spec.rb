@@ -22,7 +22,7 @@ RSpec.describe "/video-games" do
   describe "GET #index" do
     context "not authenticated" do
       it "returns an unauthorized status" do
-        get "/video-games", headers: get_headers
+        get "/video-games?include=user", headers: get_headers
         expect(response.status).to eq(401)
       end
     end
@@ -31,7 +31,7 @@ RSpec.describe "/video-games" do
       include_context "with an access token"
 
       it "returns all of the user's video games" do
-        get "/video-games", headers: get_headers
+        get "/video-games?include=user", headers: get_headers
 
         expect(response.status).to eq(200)
         expect(response_games).to_not be_nil
@@ -39,6 +39,12 @@ RSpec.describe "/video-games" do
 
         response_titles = response_games.map{|n| n["attributes"]["title"]}
         expect(response_titles).to match_array(my_games.map(&:title))
+
+        expect(response_games[0]["relationships"]["user"]["data"]).to be_present
+        expect(response_games[0]["relationships"]["user"]["data"]["id"]).to eq(me.id.to_s)
+        expect(response_json["included"]).to be_present
+        expect(response_json["included"][0]["type"]).to eq("users")
+        expect(response_json["included"][0]["id"]).to eq(me.id.to_s)
       end
     end
   end
@@ -79,17 +85,11 @@ RSpec.describe "/video-games" do
   end
 
   describe "POST #create" do
-    let(:user) { FactoryGirl.create(:user) }
     let(:params) { JSON.dump({
       "data": {
         "type": "video-games",
         "attributes": {
           title: "New Game",
-        },
-        "relationships": {
-          "user": {
-            "data": { "type": "users", "id": user.id }
-          }
         }
       }
     }) }
@@ -103,7 +103,7 @@ RSpec.describe "/video-games" do
     context "authenticated" do
       include_context "with an access token"
 
-      it "creates a game" do
+      it "creates a game for me" do
         expect {
           post "/video-games", params: params, headers: headers
         }.to change{ VideoGame.count }.by(1)
@@ -112,8 +112,35 @@ RSpec.describe "/video-games" do
 
         new_game = VideoGame.last
 
-        expect(new_game.user).to eq(user)
+        expect(new_game.user).to eq(me)
         expect(new_game.title).to eq("New Game")
+      end
+    end
+
+    context "attempting to create for another user" do
+      include_context "with an access token"
+      let(:params) { JSON.dump({
+        "data": {
+          "type": "video-games",
+          "attributes": {
+            title: "New Game",
+          },
+          "relationships": {
+            "user": {
+              "data": { "type": "users", "id": someone_else.id }
+            }
+          }
+        }
+      }) }
+
+      it "creates for logged in user anyway" do
+        expect {
+          post "/video-games", params: params, headers: headers
+        }.to change{ VideoGame.count }.by(0)
+
+        expect(response.status).to eq(400)
+        expect(response_json["errors"].count).to eq(1)
+        expect(response_json["errors"][0]["detail"]).to eq("user is not allowed.")
       end
     end
   end
