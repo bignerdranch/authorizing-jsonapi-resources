@@ -1,4 +1,6 @@
 class ApplicationResource < JSONAPI::Resource
+  include Pundit
+
   abstract
 
   private

@@ -1,5 +1,6 @@
 class ApplicationController < JSONAPI::ResourceController
   before_action :doorkeeper_authorize!
+  rescue_from Pundit::NotAuthorizedError, with: Proc.new { head :forbidden }
 
   private
 

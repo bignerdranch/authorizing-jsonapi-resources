@@ -183,6 +183,16 @@ RSpec.describe "/video-games" do
       end
     end
 
+    context "followed's game" do
+      include_context "with an access token"
+
+      let(:game) { followed_games[0] }
+      it "returns a forbidden status" do
+        patch "/video-games/#{game.id}", params: params, headers: headers
+        expect(response.status).to eq(403)
+      end
+    end
+
     context "someone else's game" do
       include_context "with an access token"
 
@@ -215,6 +225,16 @@ RSpec.describe "/video-games" do
         expect(response.status).to eq(204)
 
         expect{game.reload}.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "followed's game" do
+      include_context "with an access token"
+
+      let(:game) { followed_games[0] }
+      it "returns a forbidden status" do
+        delete "/video-games/#{game.id}", headers: headers
+        expect(response.status).to eq(403)
       end
     end
 
