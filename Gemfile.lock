@@ -63,6 +63,9 @@ GEM
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     i18n (0.7.0)
+    jsonapi-resources (0.7.1.beta2)
+      concurrent-ruby
+      rails (>= 4.0)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -88,6 +91,7 @@ GEM
       slop (~> 3.4)
     puma (3.4.0)
     rack (2.0.1)
+    rack-cors (0.4.0)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (5.0.0)
@@ -159,10 +163,12 @@ DEPENDENCIES
   capybara
   factory_girl_rails
   faker
+  jsonapi-resources (= 0.7.1.beta2)
   listen (~> 3.0.5)
   pg (~> 0.18)
   pry
   puma (~> 3.0)
+  rack-cors
   rails (~> 5.0.0)
   rspec-rails
   tzinfo-data

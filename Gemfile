@@ -5,6 +5,9 @@ gem 'rails', '~> 5.0.0'
 gem 'pg', '~> 0.18'
 gem 'puma', '~> 3.0'
 
+gem 'jsonapi-resources', '0.7.1.beta2'
+gem 'rack-cors'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
