@@ -3,11 +3,17 @@ require "rails_helper"
 RSpec.describe "/video-games" do
 
   let(:me) { FactoryGirl.create(:user, password: "password") }
+  let(:followed) { FactoryGirl.create(:user) }
+  let!(:follow) { FactoryGirl.create(:follow, follower: me, followed: followed) }
+
   let(:someone_else) { FactoryGirl.create(:user) }
 
   let(:my_games) { FactoryGirl.create_list(:video_game, 3, user: me) }
+  let(:followed_games) { FactoryGirl.create_list(:video_game, 3, user: followed) }
   let(:someone_elses_games) { FactoryGirl.create_list(:video_game, 3, user: someone_else) }
-  let!(:all_games) { my_games + someone_elses_games }
+
+  let(:my_visible_games) { my_games + followed_games }
+  let!(:all_games) { my_visible_games + someone_elses_games }
 
   let(:response_json) { JSON.parse(response.body) }
   let(:response_games) { response_json["data"] }
@@ -30,15 +36,15 @@ RSpec.describe "/video-games" do
     context "authenticated" do
       include_context "with an access token"
 
-      it "returns all of the user's video games" do
+      it "returns all of the user's and friends' video games" do
         get "/video-games?include=user", headers: get_headers
 
         expect(response.status).to eq(200)
         expect(response_games).to_not be_nil
-        expect(response_games.count).to eq(my_games.count)
+        expect(response_games.count).to eq(my_visible_games.count)
 
         response_titles = response_games.map{|n| n["attributes"]["title"]}
-        expect(response_titles).to match_array(my_games.map(&:title))
+        expect(response_titles).to match_array(my_visible_games.map(&:title))
 
         expect(response_games[0]["relationships"]["user"]["data"]).to be_present
         expect(response_games[0]["relationships"]["user"]["data"]["id"]).to eq(me.id.to_s)

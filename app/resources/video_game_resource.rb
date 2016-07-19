@@ -15,6 +15,6 @@ class VideoGameResource < ApplicationResource
 
   def self.records(options = {})
     user = current_user(options)
-    user.video_games
+    VideoGame.for_user_and_followed(user)
   end
 end
