@@ -7,9 +7,7 @@ gem 'puma', '~> 3.0'
 
 gem 'jsonapi-resources', '0.7.1.beta2'
 gem 'rack-cors'
-
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1.7'
 
 group :development, :test do
   gem 'pry'

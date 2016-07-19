@@ -10,9 +10,9 @@ VideoGame.destroy_all
 Follow.destroy_all
 User.destroy_all
 
-u1 = User.create(username: "josh", email: "josh@example.com")
-u2 = User.create(username: "actionplayer", email: "actionplayer@example.com")
-u3 = User.create(username: "sportplayer", email: "sportplayer@example.com")
+u1 = User.create(username: "josh", email: "josh@example.com", password: "password")
+u2 = User.create(username: "actionplayer", email: "actionplayer@example.com", password: "jump")
+u3 = User.create(username: "sportplayer", email: "sportplayer@example.com", password: "biggame")
 
 Follow.create(follower: u1, followed: u2)
 
