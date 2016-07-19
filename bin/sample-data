@@ -7,11 +7,14 @@ if Rails.env != "development"
 end
 
 VideoGame.destroy_all
+Follow.destroy_all
 User.destroy_all
 
 u1 = User.create(username: "josh", email: "josh@example.com")
 u2 = User.create(username: "actionplayer", email: "actionplayer@example.com")
 u3 = User.create(username: "sportplayer", email: "sportplayer@example.com")
+
+Follow.create(follower: u1, followed: u2)
 
 u1.video_games.create(title: "Ultimate Wizard")
 u1.video_games.create(title: "Airship Pilot")
